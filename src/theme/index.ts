@@ -1,5 +1,5 @@
 /**
- * Design tokens do El Niño.
+ * Design tokens do StormShield.
  * Centralizados para que todas as telas compartilhem a mesma identidade visual.
  */
 export const colors = {

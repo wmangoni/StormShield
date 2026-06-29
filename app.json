@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "elninho",
-    "slug": "elninho",
+    "name": "StormShield",
+    "slug": "stormshield",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "elninho",
+    "scheme": "stormshield",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"

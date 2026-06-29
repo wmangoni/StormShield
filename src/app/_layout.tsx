@@ -18,7 +18,7 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: colors.bg },
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'El Niño' }} />
+        <Stack.Screen name="index" options={{ title: 'StormShield' }} />
       </Stack>
     </SafeAreaProvider>
   );

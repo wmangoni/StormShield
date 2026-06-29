@@ -1,5 +1,5 @@
 /**
- * Tela inicial (Hello World). Ponto de partida do El Niño.
+ * Tela inicial (Hello World). Ponto de partida do StormShield.
  */
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,7 +11,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.container}>
-        <Title>El Niño 🌊</Title>
+        <Title>StormShield 🛡️</Title>
         <Body style={styles.subtitle}>
           Hello World! Setup inicial com Expo Router + TypeScript pronto.
         </Body>

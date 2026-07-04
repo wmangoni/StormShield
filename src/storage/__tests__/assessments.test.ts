@@ -8,6 +8,7 @@ import {
   listAssessments,
   newAssessment,
   removeAssessment,
+  renameAssessment,
   saveAssessment,
 } from '@/storage/assessments';
 
@@ -58,6 +59,21 @@ describe('assessments storage', () => {
     await removeAssessment(a.id);
     expect(await getAssessment(a.id)).toBeNull();
     expect((await listAssessments()).map((x) => x.id)).toEqual([b.id]);
+  });
+
+  it('rename troca o label e preserva as respostas', async () => {
+    const a = { ...newAssessment('Nome antigo'), answers: { 1: 4 as const } };
+    await saveAssessment(a);
+    await renameAssessment(a.id, 'Nome novo');
+    const renamed = await getAssessment(a.id);
+    expect(renamed?.label).toBe('Nome novo');
+    expect(renamed?.answers).toEqual({ 1: 4 });
+    expect(renamed?.createdAt).toBe(a.createdAt);
+  });
+
+  it('rename de id inexistente não cria avaliação', async () => {
+    await renameAssessment('nao-existe', 'X');
+    expect(await listAssessments()).toEqual([]);
   });
 
   it('storage corrompido → lista vazia (sem crash)', async () => {

@@ -73,3 +73,10 @@ export async function removeAssessment(id: string): Promise<void> {
   const all = await readAll();
   await writeAll(all.filter((a) => a.id !== id));
 }
+
+/** Renomeia mantendo o restante intacto; ignora id inexistente. */
+export async function renameAssessment(id: string, label: string): Promise<void> {
+  const assessment = await getAssessment(id);
+  if (!assessment) return;
+  await saveAssessment({ ...assessment, label, updatedAt: new Date().toISOString() });
+}

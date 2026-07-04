@@ -3,7 +3,7 @@
  * inicia uma nova. Recarrega sempre que a tela ganha foco.
  */
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,6 +16,7 @@ import {
   listAssessments,
   newAssessment,
   removeAssessment,
+  renameAssessment,
   saveAssessment,
 } from '@/storage/assessments';
 import { colors, font, radius, spacing } from '@/theme';
@@ -41,6 +42,8 @@ function openAssessment(assessment: Assessment) {
 
 export default function HomeScreen() {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
+  const [renaming, setRenaming] = useState<Assessment | null>(null);
+  const [labelDraft, setLabelDraft] = useState('');
 
   const reload = useCallback(() => {
     listAssessments().then(setAssessments);
@@ -66,6 +69,20 @@ export default function HomeScreen() {
     }
   }
 
+  function startRename(assessment: Assessment) {
+    setLabelDraft(assessment.label);
+    setRenaming(assessment);
+  }
+
+  async function saveRename() {
+    const label = labelDraft.trim();
+    if (renaming && label) {
+      await renameAssessment(renaming.id, label);
+      reload();
+    }
+    setRenaming(null);
+  }
+
   function renderItem({ item }: { item: Assessment }) {
     const answered = QUESTIONS.filter((q) => item.answers[q.id] !== undefined).length;
     const result = computeScore(item.answers);
@@ -88,13 +105,14 @@ export default function HomeScreen() {
             <Muted>sem notas</Muted>
           )}
         </View>
-        <Pressable
-          onPress={() => confirmRemoval(item)}
-          hitSlop={spacing.sm}
-          style={styles.remove}
-        >
-          <Text style={styles.removeText}>✕</Text>
-        </Pressable>
+        <View style={styles.cardActions}>
+          <Pressable onPress={() => startRename(item)} hitSlop={spacing.sm}>
+            <Text style={styles.actionIcon}>✏️</Text>
+          </Pressable>
+          <Pressable onPress={() => confirmRemoval(item)} hitSlop={spacing.sm}>
+            <Text style={styles.actionIcon}>✕</Text>
+          </Pressable>
+        </View>
       </Pressable>
     );
   }
@@ -134,6 +152,43 @@ export default function HomeScreen() {
           </Muted>
         </View>
       </View>
+
+      <Modal
+        visible={renaming !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRenaming(null)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Subtitle>Renomear avaliação</Subtitle>
+            <TextInput
+              value={labelDraft}
+              onChangeText={setLabelDraft}
+              style={styles.input}
+              placeholder="Nome da avaliação"
+              placeholderTextColor={colors.textMuted}
+              autoFocus
+              maxLength={60}
+              onSubmitEditing={saveRename}
+            />
+            <View style={styles.modalActions}>
+              <AppButton
+                label="Cancelar"
+                variant="ghost"
+                onPress={() => setRenaming(null)}
+                style={styles.modalButton}
+              />
+              <AppButton
+                label="Salvar"
+                onPress={saveRename}
+                disabled={!labelDraft.trim()}
+                style={styles.modalButton}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -185,14 +240,52 @@ const styles = StyleSheet.create({
     fontSize: font.subtitle,
     fontWeight: '800',
   },
-  remove: {
+  cardActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
     paddingLeft: spacing.sm,
   },
-  removeText: {
+  actionIcon: {
     color: colors.textMuted,
     fontSize: font.subtitle,
   },
   footer: {
     gap: spacing.sm,
+  },
+  modalBackdrop: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: spacing.lg,
+  },
+  modalCard: {
+    alignSelf: 'stretch',
+    maxWidth: 420,
+    marginHorizontal: 'auto',
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.md,
+  },
+  input: {
+    color: colors.text,
+    fontSize: font.body,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  modalButton: {
+    flex: 1,
   },
 });

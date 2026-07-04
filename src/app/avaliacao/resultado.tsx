@@ -2,7 +2,7 @@
  * Resultado da avaliação: score + tier (com aviso de falha fatal), barras por
  * categoria, ações prioritárias e itens a inspecionar.
  */
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { router, Stack } from 'expo-router';
 
 import { CategoryBar } from '@/components/CategoryBar';
@@ -11,7 +11,36 @@ import { AppButton, Body, Muted, Subtitle } from '@/components/ui';
 import { CATEGORIES, QUESTIONS } from '@/data/questionnaire';
 import { useAssessment } from '@/features/assessment/context';
 import { computeScore } from '@/lib/score';
+import { buildShareText } from '@/lib/share';
 import { colors, radius, spacing } from '@/theme';
+
+/** Web: navigator.share quando existir; senão copia e avisa. Nativo: Share. */
+async function shareText(text: string): Promise<void> {
+  if (Platform.OS === 'web') {
+    const nav = (
+      globalThis as {
+        navigator?: {
+          share?: (data: { text: string }) => Promise<void>;
+          clipboard?: { writeText: (text: string) => Promise<void> };
+        };
+      }
+    ).navigator;
+    try {
+      if (nav?.share) {
+        await nav.share({ text });
+        return;
+      }
+      await nav?.clipboard?.writeText(text);
+      (globalThis as { alert?: (msg: string) => void }).alert?.(
+        'Resultado copiado para a área de transferência!',
+      );
+    } catch {
+      // Usuário cancelou o diálogo de compartilhar — nada a fazer.
+    }
+    return;
+  }
+  await Share.share({ message: text });
+}
 
 function questionText(id: number): string {
   return QUESTIONS.find((q) => q.id === id)?.text ?? `Questão ${id}`;
@@ -118,6 +147,12 @@ export default function ResultadoScreen() {
         )}
 
         <Muted style={styles.savedHint}>Avaliação salva automaticamente ✓</Muted>
+        {scorable > 0 && (
+          <AppButton
+            label="Compartilhar resultado"
+            onPress={() => shareText(buildShareText(result))}
+          />
+        )}
         <AppButton label="Voltar ao início" variant="ghost" onPress={() => router.replace('/')} />
       </ScrollView>
     </>

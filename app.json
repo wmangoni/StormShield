@@ -43,6 +43,12 @@
         "projectId": "c212498c-ed68-491c-a02a-4c941567a7be"
       }
     },
-    "owner": "wmangoni"
+    "owner": "wmangoni",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/c212498c-ed68-491c-a02a-4c941567a7be"
+    }
   }
 }

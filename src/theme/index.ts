@@ -12,6 +12,7 @@ export const colors = {
   primary: '#22c55e',
   primaryText: '#052e16',
   accent: '#38bdf8',
+  warning: '#facc15',
   danger: '#f87171',
 } as const;
 

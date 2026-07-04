@@ -36,6 +36,8 @@ export interface Question {
   allowNA?: boolean;
   /** O "por quê" da questão, exibido ao usuário. */
   rationale: string;
+  /** Profissional/serviço a buscar no redirecionamento inteligente (Maps). */
+  service: string;
 }
 
 export const CATEGORIES: Category[] = [
@@ -62,6 +64,7 @@ export const QUESTIONS: Question[] = [
     weight: 3,
     rationale:
       'Aberturas com folga permitem entrada de vento e água; quando uma abertura cede, o interior é pressurizado e o dano se propaga.',
+    service: 'Manutenção de esquadrias e janelas',
   },
   {
     id: 25,
@@ -77,6 +80,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'Itens mal ancorados no telhado são arrancados pelo vento e abrem caminho para a entrada de água.',
+    service: 'Telhadista',
   },
   {
     id: 23,
@@ -86,6 +90,7 @@ export const QUESTIONS: Question[] = [
     weight: 3,
     rationale:
       'Proteção contra impacto evita a quebra de vidros por projéteis — a quebra de uma abertura pressuriza o interior da casa.',
+    service: 'Instalação de persianas e películas de proteção',
   },
   {
     id: 24,
@@ -99,6 +104,7 @@ export const QUESTIONS: Question[] = [
     ],
     weight: 4,
     rationale: 'Objetos soltos viram projéteis em rajadas fortes, atingindo a própria casa e as vizinhas.',
+    service: 'Marido de aluguel',
   },
   {
     id: 21,
@@ -115,6 +121,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'A porta de garagem é o modo de falha nº 1 por vento em residências: quando cede, pressuriza o interior e pode arrancar o telhado.',
+    service: 'Manutenção de portão de garagem',
   },
 
   // ── 2ª · 🌧️ Calhas e drenagem pluvial ──────────────────────────────────
@@ -131,6 +138,7 @@ export const QUESTIONS: Question[] = [
     weight: 4,
     rationale:
       'Água acumulada próxima às fundações causa recalques, infiltrações e deterioração estrutural ao longo do tempo.',
+    service: 'Serviço de drenagem residencial',
   },
   {
     id: 9,
@@ -146,6 +154,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'Folhas e sedimentos sem retenção entopem galerias subterrâneas, especialmente em eventos intensos.',
+    service: 'Encanador',
   },
   {
     id: 6,
@@ -156,6 +165,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'Calhas entupidas transbordam durante chuvas intensas, forçando a água para dentro da cobertura e das paredes.',
+    service: 'Limpeza de calhas',
   },
   {
     id: 7,
@@ -171,6 +181,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'A NBR 10844 exige inclinação mínima de 0,5%. Água parada indica acúmulo de sedimentos e entupimentos frequentes.',
+    service: 'Calheiro',
   },
   {
     id: 8,
@@ -185,6 +196,7 @@ export const QUESTIONS: Question[] = [
     weight: 4,
     allowNA: true,
     rationale: 'Condutores entupidos ou quebrados redirecionam a água para fundações e paredes.',
+    service: 'Calheiro',
   },
 
   // ── 3ª · 🌱 Terreno e permeabilidade ───────────────────────────────────
@@ -201,6 +213,7 @@ export const QUESTIONS: Question[] = [
     weight: 4,
     rationale:
       'Erosão ativa indica instabilidade que piora significativamente durante eventos de chuva intensa.',
+    service: 'Contenção de encostas',
   },
   {
     id: 13,
@@ -214,6 +227,7 @@ export const QUESTIONS: Question[] = [
     ],
     weight: 3,
     rationale: 'Terrenos mal caimentados retêm água próxima às paredes e fundações.',
+    service: 'Terraplanagem e nivelamento de terreno',
   },
   {
     id: 12,
@@ -224,6 +238,7 @@ export const QUESTIONS: Question[] = [
     fatal: true,
     rationale:
       'Histórico de alagamento indica que o sistema de drenagem já opera no limite ou abaixo dele.',
+    service: 'Serviço de drenagem residencial',
   },
   {
     id: 11,
@@ -233,6 +248,7 @@ export const QUESTIONS: Question[] = [
     weight: 3,
     rationale:
       'Terrenos 100% impermeáveis aumentam o escoamento superficial e sobrecarregam o sistema de drenagem urbano.',
+    service: 'Paisagista',
   },
 
   // ── 4ª · 🌳 Árvores e entorno ──────────────────────────────────────────
@@ -250,6 +266,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'A maioria dos acidentes com arborização envolve queda de galhos, não da árvore inteira. Poda preventiva reduz esse risco.',
+    service: 'Poda de árvores',
   },
   {
     id: 17,
@@ -265,6 +282,7 @@ export const QUESTIONS: Question[] = [
     allowNA: true,
     rationale:
       'Raízes confinadas por pavimentação comprometem a estabilidade mecânica da árvore ao longo do tempo.',
+    service: 'Arborista',
   },
   {
     id: 16,
@@ -280,6 +298,7 @@ export const QUESTIONS: Question[] = [
     fatal: true,
     allowNA: true,
     rationale: 'Galhos mortos sobre o telhado representam risco imediato em ventos acima de ~50 km/h.',
+    service: 'Poda de árvores',
   },
 
   // ── 5ª · 🏠 Cobertura e telhado ────────────────────────────────────────
@@ -297,6 +316,7 @@ export const QUESTIONS: Question[] = [
     fatal: true,
     rationale:
       'Estruturas degradadas perdem resistência e podem colapsar sob carga de vento ou granizo.',
+    service: 'Reforma estrutural de telhado',
   },
   {
     id: 3,
@@ -311,6 +331,7 @@ export const QUESTIONS: Question[] = [
     weight: 4,
     rationale:
       'Uma única telha deslocada pode iniciar o colapso de toda a cobertura durante uma tempestade.',
+    service: 'Telhadista',
   },
   {
     id: 1,
@@ -321,6 +342,7 @@ export const QUESTIONS: Question[] = [
     fatal: true,
     rationale:
       'Telhas sem fixação mecânica são arrancadas com facilidade por ventos acima de ~60 km/h.',
+    service: 'Telhadista',
   },
   {
     id: 2,
@@ -330,6 +352,7 @@ export const QUESTIONS: Question[] = [
     weight: 3,
     rationale:
       'Fissuras, microvegetação e desgaste acumulado reduzem a resistência ao impacto do granizo e do vento.',
+    service: 'Telhadista',
   },
   {
     id: 5,
@@ -338,6 +361,7 @@ export const QUESTIONS: Question[] = [
     anchors: ['Soltos / faltando', 'Folga perceptível', 'Firmes, pequenos reparos', 'Firmes, sem folga'],
     weight: 3,
     rationale: 'Beirais soltos são os primeiros elementos a falhar e podem causar danos em cadeia.',
+    service: 'Telhadista',
   },
 
   // ── 6ª · 🔧 Manutenção e histórico ─────────────────────────────────────
@@ -354,6 +378,7 @@ export const QUESTIONS: Question[] = [
     weight: 3,
     rationale:
       'Instalações elétricas expostas à umidade representam risco de curto-circuito e incêndio durante tempestades.',
+    service: 'Eletricista residencial',
   },
   {
     id: 20,
@@ -363,6 +388,7 @@ export const QUESTIONS: Question[] = [
     weight: 2,
     rationale:
       'Sem histórico de manutenção, é impossível saber quais sistemas estão operando fora dos parâmetros de projeto.',
+    service: 'Vistoria técnica residencial',
   },
   {
     id: 18,
@@ -372,5 +398,6 @@ export const QUESTIONS: Question[] = [
     weight: 4,
     rationale:
       'Infiltrações anteriores indicam falhas em impermeabilização ou drenagem que tendem a se agravar com eventos mais intensos.',
+    service: 'Impermeabilização',
   },
 ];

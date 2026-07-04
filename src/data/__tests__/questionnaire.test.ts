@@ -65,4 +65,10 @@ describe('questionnaire (estrutura)', () => {
       expect(q.rationale.trim().length).toBeGreaterThan(0);
     }
   });
+
+  it('toda questão tem um serviço de busca (redirecionamento inteligente)', () => {
+    for (const q of QUESTIONS) {
+      expect(q.service.trim().length).toBeGreaterThan(0);
+    }
+  });
 });

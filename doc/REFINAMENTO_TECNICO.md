@@ -194,6 +194,21 @@ Fluxo do questionário:
 
 Cada fase fecha com `npx tsc --noEmit` limpo + testes verdes + commit próprio.
 
+## Redirecionamento inteligente (busca de profissionais)
+
+Cada questão tem um campo `service` (ex.: "Telhadista", "Limpeza de calhas") usado nos
+cards de **ações prioritárias** do resultado: um botão "📍 Buscar" abre a busca por
+profissionais daquela categoria.
+
+- URL via **Maps URLs API oficial** (`https://www.google.com/maps/search/?api=1&query=…`),
+  que abre o app nativo do Google Maps quando instalado; fallback para a Google Busca
+  (`google.com/search?q=…`) se o `Linking.openURL` falhar. Query sempre URL-encoded
+  (`encodeURIComponent`). Lógica pura em `src/lib/maps.ts`.
+- Query: `"[serviço] próximo a [região]"` quando o usuário cadastrou a região
+  (campo opcional persistido em `src/storage/settings.ts` — CEP, bairro ou cidade);
+  **sem região, a query vai só com o serviço** e o Maps busca perto da posição atual
+  do aparelho — nenhuma permissão de localização é pedida pelo app.
+
 ## Decisões em aberto (não bloqueiam F1)
 
 - **Ícones**: manter emoji (padrão do roteirizador) ou `expo-symbols`/vector icons — decidir na F2.

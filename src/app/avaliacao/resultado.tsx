@@ -2,7 +2,17 @@
  * Resultado da avaliação: score + tier (com aviso de falha fatal), barras por
  * categoria, ações prioritárias e itens a inspecionar.
  */
-import { ActivityIndicator, Platform, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Linking,
+  Platform,
+  ScrollView,
+  Share,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import { router, Stack } from 'expo-router';
 
 import { CategoryBar } from '@/components/CategoryBar';
@@ -10,9 +20,20 @@ import { ScoreGauge } from '@/components/ScoreGauge';
 import { AppButton, Body, Muted, Subtitle } from '@/components/ui';
 import { CATEGORIES, QUESTIONS } from '@/data/questionnaire';
 import { useAssessment } from '@/features/assessment/context';
+import { buildMapsSearchUrl, buildWebSearchUrl } from '@/lib/maps';
 import { computeScore } from '@/lib/score';
 import { buildShareText } from '@/lib/share';
-import { colors, radius, spacing } from '@/theme';
+import { getUserLocation, setUserLocation } from '@/storage/settings';
+import { colors, font, radius, spacing } from '@/theme';
+
+/** Abre a busca no Google Maps; se falhar, cai para a Google Busca. */
+async function openProfessionalSearch(service: string, location: string): Promise<void> {
+  try {
+    await Linking.openURL(buildMapsSearchUrl(service, location));
+  } catch {
+    await Linking.openURL(buildWebSearchUrl(service, location)).catch(() => {});
+  }
+}
 
 /** Web: navigator.share quando existir; senão copia e avisa. Nativo: Share. */
 async function shareText(text: string): Promise<void> {
@@ -49,6 +70,16 @@ function questionText(id: number): string {
 export default function ResultadoScreen() {
   const { answers, loading } = useAssessment();
   const result = computeScore(answers);
+  const [region, setRegion] = useState('');
+
+  useEffect(() => {
+    getUserLocation().then(setRegion);
+  }, []);
+
+  function handleRegionChange(value: string) {
+    setRegion(value);
+    void setUserLocation(value); // autosave fire-and-forget
+  }
 
   const scorable = Object.values(answers).filter((v) => typeof v === 'number').length;
 
@@ -117,15 +148,33 @@ export default function ResultadoScreen() {
                 <Muted>Onde investir primeiro para subir no rank:</Muted>
                 {result.priorityActions.map((action, i) => {
                   const question = QUESTIONS.find((q) => q.id === action.questionId);
+                  if (!question) return null;
                   return (
                     <View key={action.questionId} style={styles.actionCard}>
                       <Body style={styles.actionTitle}>
-                        {i + 1}. {question?.text}
+                        {i + 1}. {question.text}
                       </Body>
-                      {question && <Muted>{question.rationale}</Muted>}
+                      <Muted>{question.rationale}</Muted>
+                      <AppButton
+                        label={`📍 Buscar: ${question.service}`}
+                        variant="ghost"
+                        onPress={() => openProfessionalSearch(question.service, region)}
+                      />
                     </View>
                   );
                 })}
+                <View style={styles.regionBox}>
+                  <Muted>Sua região (opcional — CEP, bairro ou cidade):</Muted>
+                  <TextInput
+                    value={region}
+                    onChangeText={handleRegionChange}
+                    placeholder="ex.: Porto Alegre, RS"
+                    placeholderTextColor={colors.textMuted}
+                    style={styles.regionInput}
+                    maxLength={80}
+                  />
+                  <Muted>Sem região, o Maps busca perto da sua posição atual.</Muted>
+                </View>
               </View>
             )}
 
@@ -190,6 +239,20 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     fontWeight: '600',
+  },
+  regionBox: {
+    gap: spacing.xs,
+    marginTop: spacing.sm,
+  },
+  regionInput: {
+    color: colors.text,
+    fontSize: font.body,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
   savedHint: {
     textAlign: 'center',

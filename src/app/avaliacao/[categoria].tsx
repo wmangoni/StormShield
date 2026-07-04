@@ -3,7 +3,7 @@
  * especificação. Ao terminar a última, replace para o resultado (o "voltar"
  * não reabre a última categoria).
  */
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { Redirect, router, Stack, useLocalSearchParams } from 'expo-router';
 
 import { QuestionCard } from '@/components/QuestionCard';
@@ -18,8 +18,8 @@ export function generateStaticParams(): Array<{ categoria: string }> {
 }
 
 export default function CategoriaScreen() {
-  const { categoria } = useLocalSearchParams<{ categoria: string }>();
-  const { answers, setAnswer } = useAssessment();
+  const { categoria, id } = useLocalSearchParams<{ categoria: string; id?: string }>();
+  const { answers, setAnswer, loading } = useAssessment();
 
   const index = CATEGORIES.findIndex((c) => c.id === categoria);
   if (index < 0) return <Redirect href="/" />;
@@ -29,13 +29,27 @@ export default function CategoriaScreen() {
   const answered = questions.filter((q) => answers[q.id] !== undefined).length;
   const isLast = index === CATEGORIES.length - 1;
 
+  // Search param compartilhado por todas as rotas do fluxo.
+  const idParam = typeof id === 'string' ? { id } : {};
+
   function advance() {
     if (isLast) {
-      router.replace('/avaliacao/resultado');
+      router.replace({ pathname: '/avaliacao/resultado', params: idParam });
     } else {
       const next = CATEGORIES[index + 1];
-      router.push({ pathname: '/avaliacao/[categoria]', params: { categoria: next.id } });
+      router.push({ pathname: '/avaliacao/[categoria]', params: { categoria: next.id, ...idParam } });
     }
+  }
+
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen options={{ title: `Categoria ${index + 1} de ${CATEGORIES.length}` }} />
+        <View style={styles.loading}>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </View>
+      </>
+    );
   }
 
   return (
@@ -86,5 +100,11 @@ const styles = StyleSheet.create({
   },
   hint: {
     textAlign: 'center',
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bg,
   },
 });

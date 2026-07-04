@@ -20,6 +20,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" options={{ title: 'StormShield' }} />
         <Stack.Screen name="avaliacao" options={{ headerShown: false }} />
+        <Stack.Screen name="sobre" options={{ title: 'Como funciona' }} />
       </Stack>
     </SafeAreaProvider>
   );

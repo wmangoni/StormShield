@@ -1,13 +1,14 @@
 /**
- * Resultado da avaliação: score + tier (com aviso de falha fatal), ações
- * prioritárias e itens a inspecionar. Barras por categoria chegam na fase 3.
+ * Resultado da avaliação: score + tier (com aviso de falha fatal), barras por
+ * categoria, ações prioritárias e itens a inspecionar.
  */
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { router, Stack } from 'expo-router';
 
+import { CategoryBar } from '@/components/CategoryBar';
 import { ScoreGauge } from '@/components/ScoreGauge';
 import { AppButton, Body, Muted, Subtitle } from '@/components/ui';
-import { QUESTIONS } from '@/data/questionnaire';
+import { CATEGORIES, QUESTIONS } from '@/data/questionnaire';
 import { useAssessment } from '@/features/assessment/context';
 import { computeScore } from '@/lib/score';
 import { colors, radius, spacing } from '@/theme';
@@ -17,10 +18,21 @@ function questionText(id: number): string {
 }
 
 export default function ResultadoScreen() {
-  const { answers } = useAssessment();
+  const { answers, loading } = useAssessment();
   const result = computeScore(answers);
 
   const scorable = Object.values(answers).filter((v) => typeof v === 'number').length;
+
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'Resultado' }} />
+        <View style={styles.loading}>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </View>
+      </>
+    );
+  }
 
   return (
     <>
@@ -52,6 +64,23 @@ export default function ResultadoScreen() {
                 ))}
               </View>
             )}
+
+            <View style={styles.section}>
+              <Subtitle>📊 Por categoria</Subtitle>
+              {result.categoryScores.map((cs) => {
+                const category = CATEGORIES.find((c) => c.id === cs.category);
+                if (!category) return null;
+                return (
+                  <CategoryBar
+                    key={cs.category}
+                    category={category}
+                    score={cs.score}
+                    answered={cs.answered}
+                    total={cs.total}
+                  />
+                );
+              })}
+            </View>
 
             {result.priorityActions.length > 0 && (
               <View style={styles.section}>
@@ -88,7 +117,8 @@ export default function ResultadoScreen() {
           </>
         )}
 
-        <AppButton label="Nova avaliação" variant="ghost" onPress={() => router.replace('/')} />
+        <Muted style={styles.savedHint}>Avaliação salva automaticamente ✓</Muted>
+        <AppButton label="Voltar ao início" variant="ghost" onPress={() => router.replace('/')} />
       </ScrollView>
     </>
   );
@@ -125,5 +155,14 @@ const styles = StyleSheet.create({
   },
   actionTitle: {
     fontWeight: '600',
+  },
+  savedHint: {
+    textAlign: 'center',
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.bg,
   },
 });

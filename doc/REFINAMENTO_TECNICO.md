@@ -138,7 +138,7 @@ Regras de implementação (espelham a especificação):
 
 ```ts
 export interface Assessment {
-  id: string;            // uuid simples (Crypto.randomUUID)
+  id: string;            // id local simples (timestamp+aleatório — dispensa expo-crypto)
   label: string;         // ex.: 'Minha casa'
   createdAt: string;     // ISO
   updatedAt: string;

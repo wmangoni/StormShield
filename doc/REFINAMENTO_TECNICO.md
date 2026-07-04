@@ -68,16 +68,20 @@ export interface Question {
   rationale: string;                       // o "por quê" mostrado ao usuário
 }
 
-export const CATEGORIES: Category[];
-export const QUESTIONS: Question[];        // 25 itens, ordenados por id
+export const CATEGORIES: Category[];       // na ORDEM DE APRESENTAÇÃO da especificação
+export const QUESTIONS: Question[];        // 25 itens, na ORDEM DE APRESENTAÇÃO da especificação
 ```
 
 Notas de design:
 
+- **Ordem de apresentação ≠ id.** A ordem dos arrays `CATEGORIES` e `QUESTIONS` segue a ordem
+  embaralhada fixada na especificação (categorias: aberturas → drenagem → terreno → árvores →
+  cobertura → manutenção). A UI apenas percorre os arrays — nenhum sort por id em lugar nenhum.
 - `anchors` indexado por `nota − 1` (posição 0 = nota 1). Tupla fixa de 4 garante em
   compile-time que nenhuma questão fique sem âncora.
-- `id` numérico estável é a chave da persistência — **nunca renumerar**; questão removida
-  aposenta o id, questão nova pega id novo.
+- `id` numérico estável é a chave da persistência — **nunca renumerar nem reaproveitar**;
+  reordenação de apresentação não afeta ids; questão removida aposenta o id, questão nova
+  pega id novo.
 - `rationale` guarda o texto "Por quê" da especificação — exibido no card e no resultado.
 
 ## Respostas e score (`src/lib/score.ts`)
@@ -177,7 +181,8 @@ Fluxo do questionário:
   - fronteiras exatas de tier (85, 70, 50) e não-arredondamento antes da classificação;
   - top 3 ações com desempate (fatal > peso > id).
 - `data/questionnaire.ts`: teste estrutural — 25 questões, ids únicos 1..25, todas as
-  categorias presentes, pesos ∈ {2,3,4}, fatais = {1, 4, 12, 16, 21}.
+  categorias presentes, pesos ∈ {2,3,4}, fatais = {1, 4, 12, 16, 21}, e ordem de
+  apresentação igual à da especificação (snapshot da sequência de ids).
 
 ## Plano de implementação por fases
 
